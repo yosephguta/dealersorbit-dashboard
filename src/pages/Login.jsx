@@ -27,7 +27,7 @@ export default function Login() {
     <div className="login-wrap">
       <form className="login-card" onSubmit={onSubmit}>
         <div className="login-logo">Dealers<span>Orbit</span></div>
-        <div className="login-sub">Admin &amp; Manager Dashboard</div>
+        <div className="login-sub">Manager Dashboard</div>
         <Notice kind="error">{err}</Notice>
         <label className="field">
           <span>Email</span>

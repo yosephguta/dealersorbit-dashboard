@@ -17,7 +17,7 @@ import Vehicles from './pages/manager/Vehicles'
 
 // Where a given role's shell lives.
 function homeFor(role) {
-  if (role === 'admin') return '/admin/dealerships'
+  if (role === 'admin') return '/admin/analytics'
   if (role === 'manager') return '/manager'
   return null
 }
@@ -73,8 +73,8 @@ export default function App() {
         path="/admin/analytics"
         element={<RequireRole role="admin"><Layout title="Analytics"><Analytics /></Layout></RequireRole>}
       />
-      <Route path="/admin" element={<Navigate to="/admin/dealerships" replace />} />
-      <Route path="/admin/*" element={<Navigate to="/admin/dealerships" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin/analytics" replace />} />
+      <Route path="/admin/*" element={<Navigate to="/admin/analytics" replace />} />
 
       {/* Manager shell */}
       <Route

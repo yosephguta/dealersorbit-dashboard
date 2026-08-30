@@ -2,11 +2,11 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth'
 
 const ADMIN_NAV = [
+  { to: '/admin/analytics', label: 'Analytics' },
   { to: '/admin/dealerships', label: 'Dealerships' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/bulk-assign', label: 'Bulk Assign' },
   { to: '/admin/review-queue', label: 'Review Queue' },
-  { to: '/admin/analytics', label: 'Analytics' },
 ]
 
 const MANAGER_NAV = [

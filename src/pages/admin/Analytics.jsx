@@ -16,6 +16,49 @@ const PRESETS = [
   { label: '90 days', days: 90 },
 ]
 
+// Estimated per-call_type pricing. Token-based rows use $/1M-token rates;
+// per-request rows (no tokens) use a flat $/row. Keep these in sync with the
+// providers' pricing pages.
+//   Gemini 3.5 Flash-Lite: $0.10/1M in, $0.40/1M out
+//   Claude Sonnet 4.6:     $3/1M in, $15/1M out
+//   ElevenLabs voice_tts:  $0.0243 per request
+//   Shotstack video_render: 0.7 credits × $0.195 = $0.1365 per render
+const RATES = {
+  photo_classification:    { kind: 'tokens', in: 0.10, out: 0.40 },
+  video_script_generation: { kind: 'tokens', in: 3,    out: 15   },
+  marketplace_caption:     { kind: 'tokens', in: 3,    out: 15   },
+  fb_post_caption:         { kind: 'tokens', in: 3,    out: 15   },
+  tagline_translation:     { kind: 'tokens', in: 3,    out: 15   },
+  script_preview:          { kind: 'tokens', in: 3,    out: 15   },
+  voice_tts:               { kind: 'perRow', usd: 0.0243 },
+  video_render:            { kind: 'perRow', usd: 0.1365 },
+}
+
+const RATES_TOOLTIP =
+  'Estimated rates:\n' +
+  '• photo_classification — Gemini 3.5 Flash-Lite: $0.10/1M in, $0.40/1M out\n' +
+  '• script/caption/tagline — Claude Sonnet 4.6: $3/1M in, $15/1M out\n' +
+  '• voice_tts — ElevenLabs: $0.0243 / request\n' +
+  '• video_render — Shotstack: $0.1365 / render (0.7 cr × $0.195)\n' +
+  'Token-based types use real logged tokens; per-request types use row count.'
+
+// Cost of one costs-row given its call_type. Returns null when we have no rate
+// for that call_type (so the UI can show "—" instead of a misleading $0).
+function costOf(callType, { input_tokens = 0, output_tokens = 0, rows = 0 } = {}) {
+  const r = RATES[callType]
+  if (!r) return null
+  if (r.kind === 'tokens') return input_tokens / 1e6 * r.in + output_tokens / 1e6 * r.out
+  if (r.kind === 'perRow')  return rows * r.usd
+  return null
+}
+
+function usd(n) {
+  if (n == null) return '—'
+  if (n === 0) return '$0.00'
+  if (n < 0.01) return `$${n.toFixed(4)}`   // sub-cent: show more precision
+  return `$${n.toFixed(2)}`
+}
+
 export default function Analytics() {
   const { dealerships } = useDealerships()
   const [since, setSince] = useState(daysAgoISO(7))
@@ -141,7 +184,9 @@ export default function Analytics() {
           <div className="row-between">
             <h2 className="section-title">API Usage / Costs</h2>
           </div>
-          <Notice kind="info">{costs.pricing_note}</Notice>
+          <Notice kind="info">
+            Cost is an <strong>estimate</strong>, computed here from logged tokens (LLM/Gemini) and request counts (voice/render) — hover <strong>Cost (est.)</strong> for the rates. Backend returns raw sums only.
+          </Notice>
 
           <table>
             <thead>
@@ -151,6 +196,7 @@ export default function Analytics() {
                 <th style={{ textAlign: 'right' }}>Input Tokens</th>
                 <th style={{ textAlign: 'right' }}>Output Tokens</th>
                 <th style={{ textAlign: 'right' }}>Rows</th>
+                <th style={{ textAlign: 'right' }} title={RATES_TOOLTIP}>Cost (est.) ⓘ</th>
               </tr>
             </thead>
             <tbody>
@@ -161,10 +207,11 @@ export default function Analytics() {
                   <td style={{ textAlign: 'right' }} className="muted">{r.input_tokens?.toLocaleString()}</td>
                   <td style={{ textAlign: 'right' }} className="muted">{r.output_tokens?.toLocaleString()}</td>
                   <td style={{ textAlign: 'right' }} className="muted">{r.rows?.toLocaleString()}</td>
+                  <td style={{ textAlign: 'right' }}>{usd(costOf(r.call_type, r))}</td>
                 </tr>
               ))}
               {costs.by_call_type.length === 0 && (
-                <tr><td colSpan={5}><div className="empty">No API usage in this window.</div></td></tr>
+                <tr><td colSpan={6}><div className="empty">No API usage in this window.</div></td></tr>
               )}
 
               {/* Unattributed bucket — user_id IS NULL. Surfaced separately, never folded into the total silently.
@@ -186,6 +233,8 @@ export default function Analytics() {
                 <td style={{ textAlign: 'right' }} className="muted">{costs.unattributed.input_tokens?.toLocaleString()}</td>
                 <td style={{ textAlign: 'right' }} className="muted">{costs.unattributed.output_tokens?.toLocaleString()}</td>
                 <td style={{ textAlign: 'right' }} className="muted">{costs.unattributed.rows?.toLocaleString()}</td>
+                {/* no per-type breakdown for the null-user bucket, so cost can't be split by rate */}
+                <td style={{ textAlign: 'right' }} className="muted" title="Mixed call types (user_id null) — can't price per rate here; it's already counted in the call-type rows above (unfiltered) or excluded from a dealership total (filtered).">—</td>
               </tr>
             </tbody>
             <tfoot>
@@ -197,6 +246,9 @@ export default function Analytics() {
                 <td style={{ textAlign: 'right' }}><strong>{costs.total.input_tokens?.toLocaleString()}</strong></td>
                 <td style={{ textAlign: 'right' }}><strong>{costs.total.output_tokens?.toLocaleString()}</strong></td>
                 <td style={{ textAlign: 'right' }}><strong>{costs.total.rows?.toLocaleString()}</strong></td>
+                <td style={{ textAlign: 'right' }}><strong>
+                  {usd(costs.by_call_type.reduce((s, r) => s + (costOf(r.call_type, r) || 0), 0))}
+                </strong></td>
               </tr>
             </tfoot>
           </table>
