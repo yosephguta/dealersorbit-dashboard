@@ -234,6 +234,7 @@ tr:hover td { background: #fafbff; }
 .notice-error { background: #fde8e9; color: #a01e22; border: 1px solid #f6c6c8; }
 .notice-success { background: #e7f8ee; color: #12864a; border: 1px solid #bfe9cf; }
 .notice-info { background: #e8eefb; color: var(--blue); border: 1px solid #c6d5f2; }
+.notice-warn { background: #fef3e2; color: #9a6114; border: 1px solid #f5d9a8; }
 
 /* ── Login ── */
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--dark); padding: 20px; }

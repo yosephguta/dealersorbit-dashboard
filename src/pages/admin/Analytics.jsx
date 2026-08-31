@@ -30,6 +30,7 @@ const RATES = {
   fb_post_caption:         { kind: 'tokens', in: 3,    out: 15   },
   tagline_translation:     { kind: 'tokens', in: 3,    out: 15   },
   script_preview:          { kind: 'tokens', in: 3,    out: 15   },
+  dealer_config_generation:{ kind: 'tokens', in: 3,    out: 15   },
   voice_tts:               { kind: 'perRow', usd: 0.0243 },
   video_render:            { kind: 'perRow', usd: 0.1365 },
 }
@@ -37,7 +38,7 @@ const RATES = {
 const RATES_TOOLTIP =
   'Estimated rates:\n' +
   '• photo_classification — Gemini 3.5 Flash-Lite: $0.10/1M in, $0.40/1M out\n' +
-  '• script/caption/tagline — Claude Sonnet 4.6: $3/1M in, $15/1M out\n' +
+  '• script/caption/tagline/dealer_config_generation — Claude Sonnet 4.6: $3/1M in, $15/1M out\n' +
   '• voice_tts — ElevenLabs: $0.0243 / request\n' +
   '• video_render — Shotstack: $0.1365 / render (0.7 cr × $0.195)\n' +
   'Token-based types use real logged tokens; per-request types use row count.'

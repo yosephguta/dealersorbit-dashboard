@@ -9,6 +9,7 @@ import Users from './pages/admin/Users'
 import UserDetail from './pages/admin/UserDetail'
 import BulkAssign from './pages/admin/BulkAssign'
 import ReviewQueue from './pages/admin/ReviewQueue'
+import ConfigGenerator from './pages/admin/ConfigGenerator'
 import Analytics from './pages/admin/Analytics'
 import TeamRoster from './pages/manager/TeamRoster'
 import TeamMember from './pages/manager/TeamMember'
@@ -68,6 +69,14 @@ export default function App() {
       <Route
         path="/admin/review-queue"
         element={<RequireRole role="admin"><Layout title="Config Review Queue"><ReviewQueue /></Layout></RequireRole>}
+      />
+      <Route
+        path="/admin/config-generator/:userId"
+        element={<RequireRole role="admin"><Layout title="Config Generator"><ConfigGenerator /></Layout></RequireRole>}
+      />
+      <Route
+        path="/admin/config-generator/platform/:platformId"
+        element={<RequireRole role="admin"><Layout title="Edit Config"><ConfigGenerator /></Layout></RequireRole>}
       />
       <Route
         path="/admin/analytics"

@@ -94,10 +94,23 @@ export const adminApi = {
 
   listPlatforms: (status) =>
     api.get(`/admin/dealer-platforms${status ? `?status=${status}` : ''}`),
+  getPlatform: (id) => api.get(`/admin/dealer-platforms/${id}`),
   approvePlatform: (id) => api.post(`/admin/dealer-platforms/${id}/approve`),
   rejectPlatform: (id, reason) => api.post(`/admin/dealer-platforms/${id}/reject`, { reason: reason || null }),
   assignPlatform: (id, dealershipId) =>
     api.post(`/admin/dealer-platforms/${id}/assign-to-dealership`, { dealership_id: dealershipId }),
+  assignPlatformToSalesperson: (id, email) =>
+    api.post(`/admin/dealer-platforms/${id}/assign-to-salesperson`, { email }),
+
+  // ── Dealer-config requests (review queue source) + Config Generator ──
+  dealerConfigRequests: (status) =>
+    api.get(`/admin/dealer-config-requests${status ? `?status=${status}` : ''}`),
+  dealerConfigRequest: (userId) => api.get(`/admin/dealer-config-requests/${userId}`),
+  generateConfig: (body) => api.post('/admin/dealer-config-generator/generate', body),
+  previewConfig: (platformId) => api.post(`/admin/dealer-config-generator/${platformId}/preview`, {}),
+  refineField: (platformId, body) => api.post(`/admin/dealer-config-generator/${platformId}/refine-field`, body),
+  approveGeneratedConfig: (platformId, body = {}) =>
+    api.post(`/admin/dealer-config-generator/${platformId}/approve`, body),
 
   analyticsOverview: (params = {}) => {
     const qs = new URLSearchParams()
