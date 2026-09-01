@@ -46,6 +46,7 @@ export default function ConfigGenerator() {
   const [preview, setPreview] = useState(null)
   const [activePlatforms, setActivePlatforms] = useState([])
   const [mapTo, setMapTo] = useState('')
+  const [notifyUser, setNotifyUser] = useState(true)
 
   const [err, setErr] = useState(null)
   const [flash, setFlash] = useState(null)
@@ -130,6 +131,7 @@ export default function ConfigGenerator() {
     try {
       const res = await adminApi.approveGeneratedConfig(platformId, {
         map_to_existing_platform_id: mapToId ? Number(mapToId) : null,
+        notify: notifyUser,
       })
       setFlash(res.message || 'Approved.')
       // Give the admin a beat to see the success, then return to the queue.
@@ -145,7 +147,7 @@ export default function ConfigGenerator() {
   async function approveForTest() {
     setBusy('approve-test'); setErr(null); setFlash(null)
     try {
-      const res = await adminApi.assignPlatformToSalesperson(platformId, TEST_EMAIL)
+      const res = await adminApi.assignPlatformToSalesperson(platformId, TEST_EMAIL, notifyUser)
       setFlash(`${res.message}. Now test it in the extension signed in as ${TEST_EMAIL}, then Approve for User.`)
     } catch (e) {
       setErr(errText(e))
@@ -375,6 +377,11 @@ export default function ConfigGenerator() {
       {config && (
         <div className="card" style={{ padding: 16 }}>
           <h3 style={{ marginTop: 0 }}>4. Approve</h3>
+
+          <label className="row" style={{ gap: 8, marginBottom: 12, fontSize: 13, cursor: 'pointer' }}>
+            <input type="checkbox" checked={notifyUser} onChange={(e) => setNotifyUser(e.target.checked)} />
+            Email the user a "config ready" notice (applies to both buttons below)
+          </label>
 
           {/* Step 1: test it live */}
           <p className="muted" style={{ marginTop: 0, marginBottom: 6, fontSize: 13 }}>

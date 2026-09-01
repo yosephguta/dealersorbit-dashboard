@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth'
+import { managerApi } from '../api'
+import { errText } from './ui'
 
 const ADMIN_NAV = [
   { to: '/admin/analytics', label: 'Analytics' },
@@ -18,6 +21,18 @@ const MANAGER_NAV = [
 export default function Layout({ title, children }) {
   const { user, logout } = useAuth()
   const nav = user?.role === 'admin' ? ADMIN_NAV : MANAGER_NAV
+  const [billingBusy, setBillingBusy] = useState(false)
+
+  async function openBilling() {
+    setBillingBusy(true)
+    try {
+      const { url } = await managerApi.billingPortal()
+      if (url) window.location.href = url   // Stripe Customer Portal — change plan / cancel
+    } catch (e) {
+      alert(errText(e) || 'Could not open billing. Make sure this account has a subscription.')
+      setBillingBusy(false)
+    }
+  }
 
   return (
     <div className="shell">
@@ -38,6 +53,12 @@ export default function Layout({ title, children }) {
         </nav>
         <div className="sidebar-foot">
           <div className="who">{user?.email}</div>
+          {user?.role === 'manager' && (
+            <button className="btn btn-ghost btn-sm" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.2)', background: 'transparent', marginBottom: 8 }}
+              disabled={billingBusy} onClick={openBilling}>
+              {billingBusy ? 'Opening…' : 'Manage Subscription'}
+            </button>
+          )}
           <button className="btn btn-ghost btn-sm" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.2)', background: 'transparent' }} onClick={logout}>
             Sign out
           </button>

@@ -263,12 +263,13 @@ function AssignDealershipModal({ platform, dealerships, onClose, onDone }) {
 
 function AssignSalespersonModal({ platform, onClose, onDone }) {
   const [email, setEmail] = useState('')
+  const [notify, setNotify] = useState(true)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   async function submit() {
     setBusy(true); setErr(null)
     try {
-      const res = await adminApi.assignPlatformToSalesperson(platform.id, email.trim())
+      const res = await adminApi.assignPlatformToSalesperson(platform.id, email.trim(), notify)
       onDone(res.message || `Config #${platform.id} assigned to ${email}.`)
     } catch (e) { setErr(errText(e)); setBusy(false) }
   }
@@ -288,6 +289,10 @@ function AssignSalespersonModal({ platform, onClose, onDone }) {
         <Field label="Salesperson email">
           <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="person@dealer.com" autoFocus />
         </Field>
+        <label className="row" style={{ gap: 8, marginTop: 8, fontSize: 13, cursor: 'pointer' }}>
+          <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+          Email the salesperson a "config ready" notice
+        </label>
       </div>
     </Modal>
   )

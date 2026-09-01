@@ -99,8 +99,8 @@ export const adminApi = {
   rejectPlatform: (id, reason) => api.post(`/admin/dealer-platforms/${id}/reject`, { reason: reason || null }),
   assignPlatform: (id, dealershipId) =>
     api.post(`/admin/dealer-platforms/${id}/assign-to-dealership`, { dealership_id: dealershipId }),
-  assignPlatformToSalesperson: (id, email) =>
-    api.post(`/admin/dealer-platforms/${id}/assign-to-salesperson`, { email }),
+  assignPlatformToSalesperson: (id, email, notify = true) =>
+    api.post(`/admin/dealer-platforms/${id}/assign-to-salesperson`, { email, notify }),
 
   // ── Dealer-config requests (review queue source) + Config Generator ──
   dealerConfigRequests: (status) =>
@@ -136,6 +136,8 @@ function qs(params = {}) {
 }
 
 export const managerApi = {
+  // Opens the Stripe Customer Portal (change plan / cancel). Returns { url }.
+  billingPortal: () => api.post('/billing/portal'),
   team: () => api.get('/manager/team'),
   teamMember: (userId, params = {}) => api.get(`/manager/team/${userId}${qs(params)}`),
   leaderboard: (since) => api.get(`/manager/leaderboard${since ? `?since=${since}` : ''}`),
