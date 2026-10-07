@@ -68,8 +68,8 @@ export default function SalespersonDetail({ fetcher, backTo, backLabel }) {
               <div className="v">{data.posted}</div>
               <div className="sub">
                 {data.posted_by_channel
-                  ? `🛒 ${data.posted_by_channel.marketplace} · 📘 ${data.posted_by_channel.fb_post} · 👥 ${data.posted_by_channel.fb_groups}`
-                  : 'marketplace + FB post + groups (all-time)'}
+                  ? `🛒 ${data.posted_by_channel.marketplace} · 📘 ${data.posted_by_channel.fb_post} · 👥 ${data.posted_by_channel.fb_groups} · 🎬 ${data.posted_by_channel.fb_reel || 0}`
+                  : 'marketplace + FB post + groups + reels (all-time)'}
               </div>
             </div>
           </div>
@@ -145,6 +145,7 @@ const CHANNEL_META = [
   { key: 'marketplace', label: '🛒 Marketplace' },
   { key: 'fb_post', label: '📘 Post' },
   { key: 'fb_groups', label: '👥 Groups' },
+  { key: 'fb_reel', label: '🎬 Reel' },
 ]
 function ChannelBadges({ channels, posted }) {
   const active = CHANNEL_META.filter((c) => (channels?.[c.key] || 0) > 0)
